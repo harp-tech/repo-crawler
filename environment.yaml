@@ -1,0 +1,8 @@
+name: GitHarpCrawler
+dependencies:
+  - pandas
+  - jupyter
+  - pip
+  - pip:
+    - dotmap
+    - PyGithub
