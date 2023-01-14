@@ -1,32 +1,24 @@
-import markdown
-
-from enum import Enum
-from typing import Optional
-
-from github import Repository
-
-from harprepo import HarpRepo
+import harprepo
 import fileparser.readme as readme
-
-
-class RepoFileType(Enum):
-    NONE = None
-    README = "README"
-
+from typing import List
 
 def validate_content(
-    repo: Repository.Repository | HarpRepo,
-    path: str,
-    filetype: RepoFileType,
-    fail_on_warnings=False) -> any:
+    repository: harprepo.HarpRepo,
+    template_repository: harprepo.device.TemplateDeviceRepo | harprepo.peripheral.TemplatePeripheralRepo,
+    template_files: List[str] = []) -> List[str]:
 
-    if isinstance(repo, HarpRepo):
-        repo = repo.repository
-
-    match filetype:
-        case RepoFileType.README:
-            return readme.validate(repo, path, fail_on_warnings=fail_on_warnings)
-        case _:
-            raise NotImplementedError(
-                f"File parser not implemented for {str(filetype)} file type."
-                )
+    warnings = {}
+    for file in template_files:
+        match file:
+            case "README.md":
+                this_warnings = readme.validate(
+                    filepath=file,
+                    repository=repository,
+                    template_repository=template_repository)
+            case _:
+                raise NotImplementedError(
+                    f"File validation not implemented for {str(file)}."
+                    )
+        if any(this_warnings):
+            warnings[file] = this_warnings
+    return warnings

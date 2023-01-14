@@ -1,53 +1,69 @@
 import pandoc
+import harprepo
 
-from github import Repository
 from pandoc.types import Image, Header
-from typing import List, Tuple
+from typing import List
 
-_ASSETS_PCB_PATH = "./Assets/pcb.png"
+_assets_pcb_path = "./Assets/pcb.png"
+_headers_to_ignore = ["harp-device", "harp-peripheral"]
 
 def validate(
-    repository: Repository.Repository,
-    path: str,
-    fail_on_warnings = False)-> Tuple[bool, List[str]]:
-
-    content = repository.get_contents(path)
-    _validation, _warnings = integraty_test(
-        content.decoded_content,
-        opt_filename=path,
-        fail_on_warnings=fail_on_warnings)
-    return _validation, _warnings
-
-def integraty_test(
-    decoded_content,
-    opt_filename = '',
-    fail_on_warnings = False) -> Tuple[bool, List[str]]:
-
-    is_fail = True
-    parsed_doc = pandoc.read(decoded_content)
+    filepath: str,
+    repository: harprepo.HarpRepo,
+    template_repository: harprepo.HarpRepo)-> List[str]:
 
     warnings = []
-    headers = []
-    for elt in pandoc.iter(parsed_doc):
-        if isinstance(elt, Header):
-            headers.append([elt[0], elt[1][0]])
 
+    content = repository.repository.get_contents(filepath).decoded_content
+    template_content = template_repository.repository.get_contents(filepath).decoded_content
+
+    parsed_content = pandoc.read(content)
+    parsed_template_content = pandoc.read(template_content)
+
+    #Run tests
+    warnings.append(test_headers(parsed_content, parsed_template_content))
+    warnings.append(test_pcb_image(parsed_content))
+
+    return warnings
+
+
+def test_headers(parsed_content, parsed_template_content) -> List[str]:
+
+    ## Find all expected headers in the template
+    template_headers = []
+    for elt in pandoc.iter(parsed_template_content):
+        if isinstance(elt, Header):
+            template_headers.append([elt[0], elt[1][0]])
+
+    ## Find all headers in tested repository
+    tested_headers = []
+    for elt in pandoc.iter(parsed_content):
+        if isinstance(elt, Header):
+            tested_headers.append([elt[0], elt[1][0]])
+
+    report = []
+    _ = [report.append(h) for h in template_headers if (
+        (h not in tested_headers) and (h[1] not in _headers_to_ignore)
+        )
+        ]
+    str_report = [f"Header issue in {h}" for h in report]
+    return str_report
+
+
+def test_pcb_image(parsed_content) -> List[str]:
     ## Check existence of a pcb figure
+    report = []
     images = []
-    for elt in pandoc.iter(parsed_doc):
+    for elt in pandoc.iter(parsed_content):
         if isinstance(elt, Image):
             images.append(elt)
     if len(images) == 0:
-        warnings.append(f"No figures references found in {opt_filename}")
+        report.append("No figures references found.")
     _is_asset_found = False
     for im in images:
-        if _ASSETS_PCB_PATH in im[2][0]:
+        if _assets_pcb_path in im[2][0]:
             _is_asset_found=True
             break
     if not(_is_asset_found):
-        warnings.append(f"Missing PCB figure in {_ASSETS_PCB_PATH}")
-
-    if (fail_on_warnings and (len(warnings) > 0)):
-        is_valid = False
-
-    return is_fail, warnings
+        report.append(f"Could not find figure reference to expected path ({_assets_pcb_path}).")
+    return report
