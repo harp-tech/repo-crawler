@@ -1,12 +1,17 @@
-import harprepo
-import fileparser.readme as readme
-from typing import List
+from typing import List, Optional
+
+from harpcrawler.fileparser import readme
+from harpcrawler.harprepo import HarpRepo
+
 
 def validate_content(
-    repository: harprepo.HarpRepo,
-    template_repository: harprepo.device.TemplateDeviceRepo | harprepo.peripheral.TemplatePeripheralRepo,
+    repository: HarpRepo,
+    template_repository: Optional[HarpRepo],
     template_files: List[str] = []) -> List[str]:
 
+    ## If no template is provided try to get the default
+    if template_repository is None:
+        template_repository = repository.template
     warnings = {}
     for file in template_files:
         match file:

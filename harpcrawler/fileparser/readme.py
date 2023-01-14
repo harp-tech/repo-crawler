@@ -1,16 +1,18 @@
 import pandoc
-import harprepo
 
-from pandoc.types import Image, Header
 from typing import List
+from pandoc.types import Image, Header
+
+from harpcrawler.harprepo import HarpRepo
+
 
 _assets_pcb_path = "./Assets/pcb.png"
 _headers_to_ignore = ["harp-device", "harp-peripheral"]
 
 def validate(
     filepath: str,
-    repository: harprepo.HarpRepo,
-    template_repository: harprepo.HarpRepo)-> List[str]:
+    repository: HarpRepo,
+    template_repository: HarpRepo)-> List[str]:
 
     warnings = []
 

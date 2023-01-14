@@ -1,4 +1,5 @@
-from github import Github, Repository
+from typing import Optional
+from github import Repository
 from enum import Enum
 
 class RepositoryType(Enum):
@@ -8,9 +9,11 @@ class RepositoryType(Enum):
 
 class HarpRepo():
     def __init__(self,
-        repository: Repository.Repository) -> None:
+        repository: Repository.Repository,
+        template: Optional[Repository.Repository] = None) -> None:
 
         self.repository = repository
+        self.template = template
         self.filetree = None
         self.repository_type = RepositoryType.GENERIC
 

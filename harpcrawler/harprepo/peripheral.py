@@ -1,17 +1,18 @@
 import pandas as pd
 
+from typing import List, Optional
 from github import Repository
-from harprepo import HarpRepo, RepositoryType
-from typing import List
+
+import harpcrawler.fileparser as fileparser
+from harpcrawler.harprepo import HarpRepo, RepositoryType
 
 class PeripheralRepo(HarpRepo):
 
     def __init__(self,
     repository: Repository.Repository,
-    template: Repository.Repository | None = None) -> None:
-        super().__init__(repository=repository)
+    template: Optional[Repository.Repository] = None) -> None:
+        super().__init__(repository=repository, template=template)
         self.repository_type = RepositoryType.PERIPHERAL
-        self.template = template
 
     def exist_harpfiles(self, path_list: list = None):
         if path_list is None:
@@ -27,13 +28,22 @@ class TemplatePeripheralRepo(PeripheralRepo):
             self.populate_repo()
             self.diagnosis_table = None
 
-        def run_diagnosis(self, repos_to_validate: List[PeripheralRepo]) -> None:
+        def run_diagnosis(self,
+            repos_to_validate: List[PeripheralRepo],
+            files_to_validate: List[str] = ["README.md"]) -> None:
+
             diagnosis_table = pd.DataFrame(columns = self.filetree)
             diagnosis_table = diagnosis_table.astype('bool')
 
             for repo in repos_to_validate:
+                _exists = repo.exist_harpfiles()
+                _exists["Warnings"] = [fileparser.validate_content(
+                    repository=repo,
+                    template_repository=self,
+                    template_files=files_to_validate)]
+
                 diagnosis_table = pd.concat([diagnosis_table,\
-                    pd.DataFrame(repo.exist_harpfiles(), index = [repo.repository.full_name.split("/")[-1]])\
+                    pd.DataFrame(_exists, index = [repo.repository.full_name.split("/")[-1]])\
                         ], axis=0, ignore_index=False)
             self.diagnosis_table = diagnosis_table
 
