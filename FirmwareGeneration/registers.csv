@@ -1,0 +1,6 @@
+﻿Identifier,Address,Format,Type,Description,MaskFamily
+DigitalSet,123,U16,,Sets output,DOMask
+DigitalClear,124,U16,,Clears output,DOMask
+PwmStart,125,U8,,Starts pwm,PwmMask
+PwmStop,126,U8,,Stops pwm,PwmMask
+Heartbeat,12,U8,Event,Heartbeat event,
