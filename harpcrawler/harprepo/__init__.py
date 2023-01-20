@@ -23,6 +23,7 @@ class HarpRepo():
         while contents:
             file_content = contents.pop(0)
             if file_content.type == "dir":
+                self.filetree.append(file_content.path)
                 contents.extend(self.repository.get_contents(file_content.path))
             else:
                 self.filetree.append(file_content.path)
@@ -35,7 +36,7 @@ class HarpRepo():
     def __repr__(self) -> str:
         return self.__str__()
     def __str__(self) -> str:
-        return(str(self.repository))
+        return(str(self.repository.full_name))
 
 
 

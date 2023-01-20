@@ -1,6 +1,6 @@
 import pandas as pd
 
-from typing import List, Optional
+from typing import List, Optional, Callable, Dict
 from github import Repository
 
 import harpcrawler.fileparser as fileparser
@@ -9,6 +9,9 @@ from harpcrawler.harprepo import HarpRepo, RepositoryType
 import harpcrawler.harprepo.releases as releases
 
 _expected_releases = ["HardwareVersion"]
+
+_name_consistency_checks = [
+]
 
 class PeripheralRepo(HarpRepo):
 
@@ -35,6 +38,20 @@ class PeripheralRepo(HarpRepo):
         latest_releases = releases.get_latest_release(releases_table)
         self.latest_releases = latest_releases
 
+    def check_name_consistency(
+        self,
+        check_list: Optional[List[Callable]] = None,
+        remove_test_pass: bool = True) -> Dict[str, bool]:
+        if check_list is None:
+            check_list = _name_consistency_checks
+        device_name = self.repository.name.split(".")[1].lower()
+        exists_path = self.exist_harpfiles(path_list=[x(device_name) for x in check_list])
+        if remove_test_pass:
+            test_fails = {k:v for (k,v) in exists_path.items() if v is False}
+            return test_fails
+        else:
+            return exists_path
+
 class TemplatePeripheralRepo(PeripheralRepo):
         def __init__(self, repository: Repository.Repository) -> None:
             super().__init__(repository=repository)
@@ -53,10 +70,17 @@ class TemplatePeripheralRepo(PeripheralRepo):
                 if repo.latest_releases is None:
                     repo.get_latest_releases()
                 _exists = repo.latest_releases | _exists
-                _exists["Warnings"] = [fileparser.validate_content(
+
+                ## Warnings
+                # Warnings reporting the content of specific files
+                _exists["ContentWarnings"] = [fileparser.validate_content(
                     repository=repo,
                     template_repository=self,
                     template_files=files_to_validate)]
+
+                # warnings reporting device naming conventions
+
+                _exists["NamingWarnings"] = [list(repo.check_name_consistency().keys())]
 
                 diagnosis_table = pd.concat([diagnosis_table,\
                     pd.DataFrame(_exists, index = [repo.repository.full_name.split("/")[-1]])\
