@@ -5,7 +5,9 @@ from github import Repository
 from harpcrawler.harprepo import HarpRepo, RepositoryType
 import harpcrawler.fileparser as fileparser
 
+import harpcrawler.harprepo.releases as releases
 
+_expected_releases = ["FirmwareVersion","HarpProtocolVersion","HardwareVersion"]
 class DeviceRepo(HarpRepo):
 
     def __init__(
@@ -16,6 +18,7 @@ class DeviceRepo(HarpRepo):
         super().__init__(
             repository=repository, template=template)
         self.repository_type = RepositoryType.DEVICE
+        self.latest_releases = None
 
     def exist_harpfiles(self, path_list: list = None):
         if path_list is None:
@@ -24,6 +27,14 @@ class DeviceRepo(HarpRepo):
             else:
                 raise ValueError("A valid template target must be provided!")
         return (super().exist_harpfiles(path_list))
+
+    def get_latest_releases(self, target_releases: Optional[List[str]] = None):
+        if target_releases is None:
+            target_releases = _expected_releases
+        all_releases = [x.tag_name for x in self.repository.get_releases()]
+        releases_table = releases.get_release_table(all_releases, target_releases)
+        latest_releases = releases.get_latest_release(releases_table)
+        self.latest_releases = latest_releases
 
 
 class TemplateDeviceRepo(DeviceRepo):
@@ -40,9 +51,11 @@ class TemplateDeviceRepo(DeviceRepo):
             diagnosis_table = pd.DataFrame(columns = self.filetree)
             diagnosis_table = diagnosis_table.astype('bool')
 
-
             for repo in repos_to_validate:
                 _exists = repo.exist_harpfiles()
+                if repo.latest_releases is None:
+                    repo.get_latest_releases()
+                _exists = repo.latest_releases | _exists
                 _exists["Warnings"] = [fileparser.validate_content(
                     repository=repo,
                     template_repository=self,

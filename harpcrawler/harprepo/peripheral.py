@@ -6,6 +6,10 @@ from github import Repository
 import harpcrawler.fileparser as fileparser
 from harpcrawler.harprepo import HarpRepo, RepositoryType
 
+import harpcrawler.harprepo.releases as releases
+
+_expected_releases = ["HardwareVersion"]
+
 class PeripheralRepo(HarpRepo):
 
     def __init__(self,
@@ -13,6 +17,7 @@ class PeripheralRepo(HarpRepo):
     template: Optional[Repository.Repository] = None) -> None:
         super().__init__(repository=repository, template=template)
         self.repository_type = RepositoryType.PERIPHERAL
+        self.latest_releases = None
 
     def exist_harpfiles(self, path_list: list = None):
         if path_list is None:
@@ -21,6 +26,14 @@ class PeripheralRepo(HarpRepo):
             else:
                 raise ValueError("A valid template target must be provided!")
         return (super().exist_harpfiles(path_list))
+
+    def get_latest_releases(self, target_releases: Optional[List[str]] = None):
+        if target_releases is None:
+            target_releases = _expected_releases
+        all_releases = [x.tag_name for x in self.repository.get_releases()]
+        releases_table = releases.get_release_table(all_releases, target_releases)
+        latest_releases = releases.get_latest_release(releases_table)
+        self.latest_releases = latest_releases
 
 class TemplatePeripheralRepo(PeripheralRepo):
         def __init__(self, repository: Repository.Repository) -> None:
@@ -37,6 +50,9 @@ class TemplatePeripheralRepo(PeripheralRepo):
 
             for repo in repos_to_validate:
                 _exists = repo.exist_harpfiles()
+                if repo.latest_releases is None:
+                    repo.get_latest_releases()
+                _exists = repo.latest_releases | _exists
                 _exists["Warnings"] = [fileparser.validate_content(
                     repository=repo,
                     template_repository=self,
