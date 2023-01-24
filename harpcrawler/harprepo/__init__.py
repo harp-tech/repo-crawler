@@ -28,10 +28,15 @@ class HarpRepo():
             else:
                 self.filetree.append(file_content.path)
 
-    def exist_harpfiles(self, path_list):
+    def exist_harpfiles(self, path_list, ignore_case: bool = False):
         if self.filetree is None:
             self.populate_repo()
-        return ({file : file in self.filetree for file in path_list})
+        if not(ignore_case):
+            return ({file : file in self.filetree for file in path_list})
+        else:
+            path_list = [x.casefold() for x in path_list]
+            file_tree = [x.casefold() for x in self.filetree]
+            return ({file : file in file_tree for file in path_list})
 
     def __repr__(self) -> str:
         return self.__str__()

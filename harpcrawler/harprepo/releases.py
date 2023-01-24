@@ -8,7 +8,8 @@ from typing import List, Dict, Optional
 _releases_regex = {
     "FirmwareVersion": "fw(.*)-harp*",
     "HarpProtocolVersion": "harp(.*)",
-    "HardwareVersion": "pcb(.*)"
+    "HardwareVersion": "pcb(.*)",
+    "AppVersion" : "app(.*)"
 }
 
 
@@ -16,15 +17,19 @@ def parse_release(release_string: str, release_type: str) -> Optional[version.Ve
 
     match release_type:
         case "FirmwareVersion":
-            m = (re.search(_releases_regex["FirmwareVersion"], release_string))
+            m = (re.search(_releases_regex[release_type], release_string))
             found = m.group(1) if m else None
 
         case "HarpProtocolVersion":
-            m = (re.search(_releases_regex["HarpProtocolVersion"], release_string))
+            m = (re.search(_releases_regex[release_type], release_string))
             found = m.group(1) if m else None
 
         case "HardwareVersion":
-            m = (re.search(_releases_regex["HardwareVersion"], release_string))
+            m = (re.search(_releases_regex[release_type], release_string))
+            found = m.group(1) if m else None
+
+        case "AppVersion":
+            m = (re.search(_releases_regex[release_type], release_string))
             found = m.group(1) if m else None
 
         case _:

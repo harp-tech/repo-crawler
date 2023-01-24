@@ -22,13 +22,13 @@ class PeripheralRepo(HarpRepo):
         self.repository_type = RepositoryType.PERIPHERAL
         self.latest_releases = None
 
-    def exist_harpfiles(self, path_list: list = None):
+    def exist_harpfiles(self, path_list: list = None, ignore_case: bool = False):
         if path_list is None:
             if self.template is not None:
                 path_list = self.template.filetree
             else:
                 raise ValueError("A valid template target must be provided!")
-        return (super().exist_harpfiles(path_list))
+        return (super().exist_harpfiles(path_list=path_list, ignore_case=ignore_case))
 
     def get_latest_releases(self, target_releases: Optional[List[str]] = None):
         if target_releases is None:
@@ -41,11 +41,14 @@ class PeripheralRepo(HarpRepo):
     def check_name_consistency(
         self,
         check_list: Optional[List[Callable]] = None,
-        remove_test_pass: bool = True) -> Dict[str, bool]:
+        remove_test_pass: bool = True,
+        ignore_case: bool = True) -> Dict[str, bool]:
         if check_list is None:
             check_list = _name_consistency_checks
         device_name = self.repository.name.split(".")[1].lower()
-        exists_path = self.exist_harpfiles(path_list=[x(device_name) for x in check_list])
+        exists_path = self.exist_harpfiles(
+            path_list=[x(device_name) for x in check_list],
+            ignore_case=ignore_case)
         if remove_test_pass:
             test_fails = {k:v for (k,v) in exists_path.items() if v is False}
             return test_fails
