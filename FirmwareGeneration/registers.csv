@@ -1,7 +1,8 @@
-﻿Identifier,Address,Format,ArrayLength,Type,Description,MaskFamily
-DigitalSet,123,U16,,,Sets output,DOMask
-DigitalClear,124,U16,,,Clears output,DOMask
-PwmStart,125,U8,None,,Starts pwm,PwmMask
-PwmStop,126,U8,,,Stops pwm,PwmMask
-Heartbeat,12,U8,,Event,Heartbeat event,
-AnalogConverter,44,S16,2,Event,adc read,
+﻿Name,Address,Format,PayloadFormat,Type,Description,MaskFamily,Converter,AutoInterface
+DigitalSet,123,U16,Set,,Sets output,DOMask,,True
+DigitalClear,124,U16,Clear,,Clears output,DOMask,,True
+PwmStart,125,U8,1,,Starts pwm,PwmMask,,True
+PwmStop,126,U8,,,Stops pwm,PwmMask,,True
+Heartbeat,12,U8,,Event,Heartbeat event,,,False
+AnalogConverter,44,S16,2,Event,adc read,,RegToVoltage,True
+AnalogConverterEncoder,44,S16,ADC1;ADC2;Encoder,Event,adc read,,,True

@@ -1,4 +1,4 @@
-﻿Identifier,BitMask,Format,Description
+﻿Name,BitMask,Format,Description
 DOMask_Poke0,1<<0,U16,Output of Poke0
 DOMask_Poke1,1<<1,U16,Output of Poke1
 DOMask_Poke2,1<<2,U16,Output of Poke2
