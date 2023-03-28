@@ -1,7 +1,7 @@
 import gspread
 import pandas as pd
-
-from typing import Optional
+import json
+from typing import Optional, Dict
 
 
 class HarpSpreadsheet:
@@ -9,11 +9,12 @@ class HarpSpreadsheet:
     def __init__(
         self,
         spreadsheet: Optional[str] = None,
-        credentials: Optional[str] = None
-        ) -> None:
+        credentials: Optional[str | Dict] = None) -> None:
 
         if credentials:
-            self.gc = gspread.service_account(credentials)
+            if isinstance(credentials, str):
+                credentials = json.loads(credentials)
+            self.gc = gspread.service_account_from_dict(credentials)
         else:
             self.gc = gspread.service_account()
         self.spreadsheet = spreadsheet
