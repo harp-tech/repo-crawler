@@ -8,8 +8,8 @@ from harpcrawler.harprepo.peripheral import PeripheralRepo, TemplatePeripheralRe
 from harpcrawler.gsheets import HarpSpreadsheet
 
 # Tokens
-GITHUB_KEY = os.envrion.get("CREDENTIAL_GITHUB", None)
-GOOGLE_KEY = os.envrion.get("CREDENTIAL_GOOGLE", None)
+GITHUB_KEY = os.environ.get("CREDENTIAL_GITHUB", None)
+GOOGLE_KEY = os.environ.get("CREDENTIAL_GOOGLE", None)
 
 # Flags
 ORGANIZATION = "harp-tech"
