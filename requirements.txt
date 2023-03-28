@@ -1,7 +1,7 @@
-pandas
-dotmap
-PyGithub
-gspread
-Markdown
-pandoc
-packaging
+pandas=1.5.2
+dotmap=1.3.30
+PyGithub=1.57
+gspread=5.7.2
+Markdown=3.4.1
+pandoc=2.3
+packaging=22.0
