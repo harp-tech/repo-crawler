@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import pandas as pd
-import json
-
+import os
 from github import Github
 
 from harpcrawler.harprepo.device import DeviceRepo, TemplateDeviceRepo
