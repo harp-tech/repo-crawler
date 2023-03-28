@@ -3,13 +3,19 @@ import pandas as pd
 
 from typing import Optional
 
+
 class HarpSpreadsheet:
-    gc = gspread.service_account()
 
     def __init__(
         self,
-        spreadsheet: Optional[str] = None) -> None:
+        spreadsheet: Optional[str] = None,
+        credentials: Optional[str] = None
+        ) -> None:
 
+        if credentials:
+            self.gc = gspread.service_account(credentials)
+        else:
+            self.gc = gspread.service_account()
         self.spreadsheet = spreadsheet
         self._sh = None
         self.current_worksheet = None
