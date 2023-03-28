@@ -13,7 +13,7 @@ class HarpSpreadsheet:
 
         if credentials:
             if isinstance(credentials, str):
-                credentials = json.loads(credentials)
+                credentials = json.loads(credentials, strict=False)
             self.gc = gspread.service_account_from_dict(credentials)
         else:
             self.gc = gspread.service_account()
