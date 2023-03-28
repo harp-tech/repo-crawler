@@ -17,7 +17,7 @@ GOOGLE_KEY = os.envrion.get("CREDENTIAL_GOOGLE", None)
 ORGANIZATION = "harp-tech"
 SPREADSHEET = "GitHarpCrawler"
 PRINT_DIAGNOSIS = True
-UPDATE_SPREADSHEET = False
+UPDATE_SPREADSHEET = True
 
 
 def main():
