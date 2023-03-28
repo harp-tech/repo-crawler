@@ -1,0 +1,7 @@
+pandas
+dotmap
+PyGithub
+gspread
+Markdown
+pandoc
+packaging
