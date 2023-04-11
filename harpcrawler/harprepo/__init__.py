@@ -2,15 +2,18 @@ from typing import Optional
 from github import Repository
 from enum import Enum
 
+
 class RepositoryType(Enum):
     GENERIC = "GENERIC"
     PERIPHERAL = "Peripheral"
     DEVICE = "Device"
 
+
 class HarpRepo():
+
     def __init__(self,
-        repository: Repository.Repository,
-        template: Optional[Repository.Repository] = None) -> None:
+                 repository: Repository.Repository,
+                 template: Optional[Repository.Repository] = None) -> None:
 
         self.repository = repository
         self.template = template
@@ -32,11 +35,11 @@ class HarpRepo():
         if self.filetree is None:
             self.populate_repo()
         if not(ignore_case):
-            return ({file : file in self.filetree for file in path_list})
+            return ({file: file in self.filetree for file in path_list})
         else:
             path_list = [x.casefold() for x in path_list]
             file_tree = [x.casefold() for x in self.filetree]
-            return ({file : file in file_tree for file in path_list})
+            return ({file: file in file_tree for file in path_list})
 
     def __repr__(self) -> str:
         return self.__str__()
