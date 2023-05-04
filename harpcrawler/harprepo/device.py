@@ -4,7 +4,6 @@ from github import Repository
 
 from harpcrawler.harprepo import HarpRepo, RepositoryType
 import harpcrawler.fileparser as fileparser
-
 import harpcrawler.harprepo.releases as releases
 
 _expected_releases = ["FirmwareVersion",
@@ -69,6 +68,26 @@ class DeviceRepo(HarpRepo):
         else:
             return exists_path
 
+    def get_yml_schema_metadata(self,
+                                filename: str = "./device.yml"
+                                ) -> Optional[Dict[str, str]]:
+
+        _is_file = all([x for x in self.exist_harpfiles(
+            path_list=[filename])]
+            )
+        if not _is_file:
+            return None
+        else:
+            yml = fileparser.device_schema.load(
+                self.repository.get_contents(filename).decoded_content)
+            metadata = {
+                "device": yml["device"],
+                "whoAmI": yml["whoAmI"],
+                "firmwareVersion": yml["firmwareVersion"],
+                "hardwareTargets": yml["hardwareTargets"]
+            }
+            return metadata
+
 
 class TemplateDeviceRepo(DeviceRepo):
     def __init__(
@@ -90,10 +109,16 @@ class TemplateDeviceRepo(DeviceRepo):
         diagnosis_table = diagnosis_table.astype('bool')
 
         for repo in repos_to_validate:
-            _exists = repo.exist_harpfiles()
+            _exists = {}
+            _exists |= repo.exist_harpfiles()
             if repo.latest_releases is None:
                 repo.get_latest_releases()
-            _exists = repo.latest_releases | _exists
+            _exists |= repo.latest_releases | _exists
+
+            # Check if the device.yml file exists and get the WHOAMI
+            _yml_filename = "./device.yml"
+            _exists["whoAmI"] = repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]\
+                if repo.get_yml_schema_metadata() else f"{_yml_filename} not found!"
 
             # Warnings
             # Warnings reporting the content of specific files
