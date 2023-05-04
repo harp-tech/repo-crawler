@@ -78,7 +78,7 @@ class DeviceRepo(HarpRepo):
         if not _is_file:
             return None
         else:
-            yml = fileparser.device_schema.load(
+            yml = fileparser.parse_yml(
                 self.repository.get_contents(filename).decoded_content)
             metadata = {
                 "device": yml["device"],

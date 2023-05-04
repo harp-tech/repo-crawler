@@ -27,3 +27,14 @@ def validate_content(
         if any(this_warnings):
             warnings[file] = this_warnings
     return warnings
+    
+    
+import yaml
+from typing import Dict
+from yaml import Loader
+
+def parse_yml(content: str) -> Dict:
+    try:
+        return yaml.load(content, Loader)
+    except yaml.YAMLError as exception:
+        raise exception
