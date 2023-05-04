@@ -113,7 +113,7 @@ class TemplateDeviceRepo(DeviceRepo):
 
             # Check if the device.yml file exists and get the WHOAMI
             _yml_filename = "device.yml"
-            _exists["whoAmI"] = repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]\
+            _exists["WhoAmI"] = repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]\
                 if repo.get_yml_schema_metadata(filename=_yml_filename) else f"{_yml_filename} not found!"
 
             _exists |= repo.exist_harpfiles()
