@@ -69,7 +69,7 @@ class DeviceRepo(HarpRepo):
             return exists_path
 
     def get_yml_schema_metadata(self,
-                                filename: str = "./device.yml"
+                                filename: str = "device.yml"
                                 ) -> Optional[Dict[str, str]]:
 
         _is_file = all([x is True for x in self.exist_harpfiles(
@@ -116,9 +116,9 @@ class TemplateDeviceRepo(DeviceRepo):
             _exists |= repo.latest_releases | _exists
 
             # Check if the device.yml file exists and get the WHOAMI
-            _yml_filename = "./device.yml"
+            _yml_filename = "device.yml"
             _exists["whoAmI"] = repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]\
-                if repo.get_yml_schema_metadata() else f"{_yml_filename} not found!"
+                if repo.get_yml_schema_metadata(filename=_yml_filename) else f"{_yml_filename} not found!"
 
             # Warnings
             # Warnings reporting the content of specific files
