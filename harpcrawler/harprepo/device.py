@@ -72,8 +72,8 @@ class DeviceRepo(HarpRepo):
                                 filename: str = "./device.yml"
                                 ) -> Optional[Dict[str, str]]:
 
-        _is_file = all([x for x in self.exist_harpfiles(
-            path_list=[filename])]
+        _is_file = all([x is True for x in self.exist_harpfiles(
+            path_list=[filename]).values()]
             )
         if not _is_file:
             return None
