@@ -135,10 +135,11 @@ class TemplateDeviceRepo(DeviceRepo):
                 )]
 
             diagnosis_table = pd.concat([
-                diagnosis_table,
                 pd.DataFrame(_exists,
                              index=[repo.repository.full_name.split("/")[-1]]
-                             )], axis=0, ignore_index=False)
+                             ),
+                diagnosis_table
+                ], axis=0, ignore_index=False)
 
         self.diagnosis_table = diagnosis_table
 
