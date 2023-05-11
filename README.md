@@ -1,6 +1,8 @@
 # GitHarpCrawler
 Code to query and automatically generate assets from the harp-tech organization's repositories
 
+[The current google sheets target can be found here.](https://docs.google.com/spreadsheets/d/1ZjgfpKjjQnCMx7Z6JxweBzrvd6ZNkaRnnd75J6-5pSM/edit#gid=1169222724)
+
 
 ## Getting started
 
