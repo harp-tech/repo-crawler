@@ -36,7 +36,7 @@ def main():
                     for repo in harp_organization.get_repos()
                     if (("device." in repo.full_name) and
                         not("template" in repo.full_name) and
-                        not(repo.is_template))]
+                        not(repo.is_template) and not(repo.archived))]
 
     device_template.run_diagnosis(repos_to_validate=device_repos)
     device_diagnosis = device_template.print_diagnosis().applymap(lambda x: str(x))
@@ -53,7 +53,7 @@ def main():
                         for repo in harp_organization.get_repos()
                         if (("peripheral." in repo.full_name) and
                             not("template" in repo.full_name) and
-                            not(repo.is_template))]
+                            not(repo.is_template) and not(repo.archived))]
     peripheral_template.run_diagnosis(repos_to_validate=peripheral_repos)
     peripherals_diagnosis = peripheral_template.print_diagnosis().applymap(lambda x: str(x))
 
