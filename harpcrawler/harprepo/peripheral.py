@@ -85,27 +85,31 @@ class TemplatePeripheralRepo(PeripheralRepo):
         diagnosis_table = diagnosis_table.astype('bool')
 
         for repo in repos_to_validate:
-            _exists = repo.exist_harpfiles()
-            if repo.latest_releases is None:
-                repo.get_latest_releases()
-            _exists = repo.latest_releases | _exists
+            try:
+                _exists = repo.exist_harpfiles()
+                if repo.latest_releases is None:
+                    repo.get_latest_releases()
+                _exists = repo.latest_releases | _exists
 
-            # Warnings
-            # Warnings reporting the content of specific files
-            _exists["ContentWarnings"] = [fileparser.validate_content(
-                repository=repo,
-                template_repository=self,
-                template_files=files_to_validate)]
+                # Warnings
+                # Warnings reporting the content of specific files
+                _exists["ContentWarnings"] = [fileparser.validate_content(
+                    repository=repo,
+                    template_repository=self,
+                    template_files=files_to_validate)]
 
-            # warnings reporting device naming conventions
+                # warnings reporting device naming conventions
 
-            _exists["NamingWarnings"] = [list(repo.check_name_consistency().keys())]
+                _exists["NamingWarnings"] = [list(repo.check_name_consistency().keys())]
 
-            diagnosis_table = pd.concat([
-                diagnosis_table,
-                pd.DataFrame(_exists,
-                             index=[repo.repository.full_name.split("/")[-1]])
-                ], axis=0, ignore_index=False)
+                diagnosis_table = pd.concat([
+                    diagnosis_table,
+                    pd.DataFrame(_exists,
+                                index=[repo.repository.full_name.split("/")[-1]])
+                    ], axis=0, ignore_index=False)
+            except Exception as err:
+                print(f"Error while diagnosing {repo.repository.full_name}: {err}")
+
         self.diagnosis_table = diagnosis_table
 
     def print_diagnosis(self) -> pd.DataFrame:

@@ -109,37 +109,40 @@ class TemplateDeviceRepo(DeviceRepo):
         diagnosis_table = diagnosis_table.astype('bool')
 
         for repo in repos_to_validate:
-            _exists = {}
+            try:
+                _exists = {}
 
-            # Check if the device.yml file exists and get the WHOAMI
-            _yml_filename = "device.yml"
-            _exists["WhoAmI"] = repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]\
-                if repo.get_yml_schema_metadata(filename=_yml_filename) else f"{_yml_filename} not found!"
+                # Check if the device.yml file exists and get the WHOAMI
+                _yml_filename = "device.yml"
+                _exists["WhoAmI"] = repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]\
+                    if repo.get_yml_schema_metadata(filename=_yml_filename) else f"{_yml_filename} not found!"
 
-            _exists |= repo.exist_harpfiles()
-            if repo.latest_releases is None:
-                repo.get_latest_releases()
-            _exists |= repo.latest_releases | _exists
+                _exists |= repo.exist_harpfiles()
+                if repo.latest_releases is None:
+                    repo.get_latest_releases()
+                _exists |= repo.latest_releases | _exists
 
-            # Warnings
-            # Warnings reporting the content of specific files
-            _exists["ContentWarnings"] = [fileparser.validate_content(
-                repository=repo,
-                template_repository=self,
-                template_files=files_to_validate)]
+                # Warnings
+                # Warnings reporting the content of specific files
+                _exists["ContentWarnings"] = [fileparser.validate_content(
+                    repository=repo,
+                    template_repository=self,
+                    template_files=files_to_validate)]
 
-            # Warnings reporting device naming conventions
-            _exists["NamingWarnings"] = [
-                list(
-                    repo.check_name_consistency(remove_test_pass=True).keys()
-                )]
+                # Warnings reporting device naming conventions
+                _exists["NamingWarnings"] = [
+                    list(
+                        repo.check_name_consistency(remove_test_pass=True).keys()
+                    )]
 
-            diagnosis_table = pd.concat([
-                pd.DataFrame(_exists,
-                             index=[repo.repository.full_name.split("/")[-1]]
-                             ),
-                diagnosis_table
-                ], axis=0, ignore_index=False)
+                diagnosis_table = pd.concat([
+                    pd.DataFrame(_exists,
+                                index=[repo.repository.full_name.split("/")[-1]]
+                                ),
+                    diagnosis_table
+                    ], axis=0, ignore_index=False)
+            except Exception as err:
+                print(f"Error while diagnosing {repo.repository.full_name}: {err}")
 
         self.diagnosis_table = diagnosis_table
 
