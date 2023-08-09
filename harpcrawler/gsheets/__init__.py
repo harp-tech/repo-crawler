@@ -53,3 +53,4 @@ class HarpSpreadsheet:
             _ = self.add_worksheet(title=title)
         self.current_worksheet.clear()
         self.current_worksheet.update([table.columns.values.tolist()] + table.values.tolist())
+        self.current_worksheet.freeze(cols=0)
