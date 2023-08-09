@@ -1,0 +1,26 @@
+# Builds and publishes the documentation website to gh-pages branch
+name: RepositoryStatus
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: pandoc
+        run: sudo apt-get install -y pandoc
+      - name: Run RepositoryStatus
+        env:
+          CREDENTIAL_GITHUB: ${{ secrets.CREDENTIAL_GITHUB }}
+          CREDENTIAL_GOOGLE: ${{ secrets.CREDENTIAL_GOOGLE }}
+        run: |
+          pip install -r requirements.txt
+          python3 main.py
