@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 from github import Github
+import gspread_formatting as gsf
 
 from harpcrawler.harprepo.device import DeviceRepo, TemplateDeviceRepo
 from harpcrawler.harprepo.peripheral import PeripheralRepo, TemplatePeripheralRepo
@@ -46,6 +47,7 @@ def main():
     if UPDATE_SPREADSHEET:
         harpSpreadsheet.open_spreadsheet()
         harpSpreadsheet.update_spreadsheet("devices", device_diagnosis)
+        gsf.set_frozen(harpSpreadsheet.get_worksheet("devices"), cols=0)
 
     # Get all "Peripherals.*" repositories
 
@@ -62,6 +64,7 @@ def main():
     if UPDATE_SPREADSHEET:
         harpSpreadsheet.open_spreadsheet()
         harpSpreadsheet.update_spreadsheet("peripherals", peripherals_diagnosis)
+        gsf.set_frozen(harpSpreadsheet.get_worksheet("peripherals"), cols=0)
 
     return 0
 

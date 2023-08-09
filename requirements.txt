@@ -6,3 +6,4 @@ Markdown==3.4.1
 pandoc==2.3
 packaging==22.0
 PyYAML==6.0
+gspread_formatting==1.1.2
