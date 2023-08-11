@@ -15,17 +15,18 @@ def validate(
     template_repository: HarpRepo)-> List[str]:
 
     warnings = []
+    try:
+        content = repository.repository.get_contents(filepath).decoded_content
+        template_content = template_repository.repository.get_contents(filepath).decoded_content
 
-    content = repository.repository.get_contents(filepath).decoded_content
-    template_content = template_repository.repository.get_contents(filepath).decoded_content
+        parsed_content = pandoc.read(content)
+        parsed_template_content = pandoc.read(template_content)
 
-    parsed_content = pandoc.read(content)
-    parsed_template_content = pandoc.read(template_content)
-
-    #Run tests
-    warnings.append(test_headers(parsed_content, parsed_template_content))
-    warnings.append(test_pcb_image(parsed_content))
-
+        # Run tests
+        warnings.append(test_headers(parsed_content, parsed_template_content))
+        warnings.append(test_pcb_image(parsed_content))
+    except:
+        warnings.append("Could not parse file.")
     return warnings
 
 
