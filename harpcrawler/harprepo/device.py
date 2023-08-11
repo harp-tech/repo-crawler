@@ -44,7 +44,7 @@ class DeviceRepo(HarpRepo):
     def get_latest_releases(self, target_releases: Optional[List[str]] = None):
         if target_releases is None:
             target_releases = _expected_releases
-        all_releases = [x.title for x in self.repository.get_releases()]
+        all_releases = [x.html_url.split("/")[-1] for x in self.repository.get_releases()]
         releases_table = releases.get_release_table(
             all_releases, target_releases)
         latest_releases = releases.get_latest_release(releases_table)
