@@ -9,7 +9,8 @@ import harpcrawler.harprepo.releases as releases
 _expected_releases = ["FirmwareVersion",
                       "HarpProtocolVersion",
                       "HardwareVersion",
-                      "AppVersion"]
+                      "AppVersion",
+                      "ApiVersion"]
 
 _name_consistency_checks = [
     lambda x: f"Firmware/{x.lower()}",

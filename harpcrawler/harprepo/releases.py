@@ -9,7 +9,8 @@ _releases_regex = {
     "FirmwareVersion": "fw(.*)-harp*",
     "HarpProtocolVersion": "harp(.*)",
     "HardwareVersion": "pcb(.*)",
-    "AppVersion" : "app(.*)"
+    "AppVersion": "app(.*)",
+    "ApiVersion": "api(.*)"
 }
 
 
@@ -32,12 +33,17 @@ def parse_release(release_string: str, release_type: str) -> Optional[version.Ve
             m = (re.search(_releases_regex[release_type], release_string))
             found = m.group(1) if m else None
 
+        case "ApiVersion":
+            m = (re.search(_releases_regex[release_type], release_string))
+            found = m.group(1) if m else None
+
         case _:
             raise NotImplementedError(
                 f"Unknown release type: {release_type} in release {release_string}."
                 )
 
     return version.parse(found) if found is not None else None
+
 
 def get_releases(release_string: str, target_releases: Optional[List[str]] = None) -> Dict[str,version.Version]:
     if target_releases is None:
@@ -51,6 +57,7 @@ def get_releases(release_string: str, target_releases: Optional[List[str]] = Non
     if not has_rel:
         raise AssertionError(f"No valid release found for release string {release_string}")
     return this_rel_versions
+
 
 def get_release_table(release_list: List[str], target_releases: Optional[List[str]] = None) -> pd.DataFrame:
     if target_releases is None:
@@ -67,6 +74,7 @@ def get_release_table(release_list: List[str], target_releases: Optional[List[st
     release_table = pd.DataFrame(rows)
     release_table.set_index("Release", inplace=True)
     return release_table
+
 
 def get_latest_release(release_table: pd.DataFrame) -> Dict[str, Optional[version.Version]]:
     latest_rel = {}
