@@ -1,10 +1,12 @@
 import pandas as pd
-from typing import List, Optional, Dict, Callable
+from typing import List, Optional, Dict, Callable, Tuple
 from github import Repository
 
 from harpcrawler.harprepo import HarpRepo, RepositoryType
 import harpcrawler.fileparser as fileparser
 import harpcrawler.harprepo.releases as releases
+import packaging.version as version
+
 
 _expected_releases = [
     "FirmwareVersion",
@@ -67,23 +69,29 @@ class DeviceRepo(HarpRepo):
 
     def get_yml_schema_metadata(
         self, filename: str = "device.yml"
-    ) -> Optional[Dict[str, str]]:
+    ) -> Tuple[bool, Dict[str, str]]:
         _is_file = all(
             [x is True for x in self.exist_harpfiles(path_list=[filename]).values()]
         )
         if not _is_file:
-            return None
+            metadata = {
+                "schema_device": f"{filename} not found!",
+                "schema_whoAmI": f"{filename} not found!",
+                "schema_firmwareVersion": f"{filename} not found!",
+                "schema_hardwareTargets": f"{filename} not found!",
+            }
+            return (False, metadata)
         else:
             yml = fileparser.parse_yml(
                 self.repository.get_contents(filename).decoded_content
             )
             metadata = {
-                "device": yml["device"],
-                "whoAmI": yml["whoAmI"],
-                "firmwareVersion": yml["firmwareVersion"],
-                "hardwareTargets": yml["hardwareTargets"],
+                "schema_device": yml["device"],
+                "schema_whoAmI": yml["whoAmI"],
+                "schema_firmwareVersion": yml["firmwareVersion"],
+                "schema_hardwareTargets": yml["hardwareTargets"],
             }
-            return metadata
+            return (True, metadata)
 
 
 class TemplateDeviceRepo(DeviceRepo):
@@ -102,24 +110,38 @@ class TemplateDeviceRepo(DeviceRepo):
 
         for repo in repos_to_validate:
             try:
-                _exists = {}
+                output_table = {}
 
                 # Check if the device.yml file exists and get the WHOAMI
                 _yml_filename = "device.yml"
-                _exists["WhoAmI"] = (
-                    repo.get_yml_schema_metadata(filename=_yml_filename)["whoAmI"]
-                    if repo.get_yml_schema_metadata(filename=_yml_filename)
-                    else f"{_yml_filename} not found!"
+                has_yml, yml_metadata = repo.get_yml_schema_metadata(
+                    filename=_yml_filename
                 )
+                if has_yml:
+                    output_table |= yml_metadata
+                else:
+                    output_table |= yml_metadata
+                    print(
+                        f"Warning: {repo.repository.full_name} does not have a {_yml_filename} file!"
+                    )
 
-                _exists |= repo.exist_harpfiles()
+                # Check releases
+                output_table |= repo.exist_harpfiles()
                 if repo.latest_releases is None:
                     repo.get_latest_releases()
-                _exists |= repo.latest_releases | _exists
+                output_table |= repo.latest_releases | output_table
+
+                # Match firmware releases
+                if (has_yml) and (output_table["FirmwareVersion"] is not None):
+                    output_table["HasUpdatedFirmware"] = version.parse(
+                        output_table["schema_firmwareVersion"]
+                    ) == (output_table["FirmwareVersion"])
+                else:
+                    output_table["HasUpdatedFirmware"] = False
 
                 # Warnings
                 # Warnings reporting the content of specific files
-                _exists["ContentWarnings"] = [
+                output_table["ContentWarnings"] = [
                     fileparser.validate_content(
                         repository=repo,
                         template_repository=self,
@@ -128,14 +150,17 @@ class TemplateDeviceRepo(DeviceRepo):
                 ]
 
                 # Warnings reporting device naming conventions
-                _exists["NamingWarnings"] = [
+                output_table["NamingWarnings"] = [
                     list(repo.check_name_consistency(remove_test_pass=True).keys())
                 ]
+
+                # Releases warnings
 
                 diagnosis_table = pd.concat(
                     [
                         pd.DataFrame(
-                            _exists, index=[repo.repository.full_name.split("/")[-1]]
+                            output_table,
+                            index=[repo.repository.full_name.split("/")[-1]],
                         ),
                         diagnosis_table,
                     ],
