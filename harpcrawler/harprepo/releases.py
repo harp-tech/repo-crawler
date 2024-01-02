@@ -10,42 +10,43 @@ _releases_regex = {
     "HarpProtocolVersion": "harp(.*)",
     "HardwareVersion": "pcb(.*)",
     "AppVersion": "app(.*)",
-    "ApiVersion": "api(.*)"
+    "ApiVersion": "api(.*)",
 }
 
 
 def parse_release(release_string: str, release_type: str) -> Optional[version.Version]:
-
     match release_type:
         case "FirmwareVersion":
-            m = (re.search(_releases_regex[release_type], release_string))
+            m = re.search(_releases_regex[release_type], release_string)
             found = m.group(1) if m else None
 
         case "HarpProtocolVersion":
-            m = (re.search(_releases_regex[release_type], release_string))
+            m = re.search(_releases_regex[release_type], release_string)
             found = m.group(1) if m else None
 
         case "HardwareVersion":
-            m = (re.search(_releases_regex[release_type], release_string))
+            m = re.search(_releases_regex[release_type], release_string)
             found = m.group(1) if m else None
 
         case "AppVersion":
-            m = (re.search(_releases_regex[release_type], release_string))
+            m = re.search(_releases_regex[release_type], release_string)
             found = m.group(1) if m else None
 
         case "ApiVersion":
-            m = (re.search(_releases_regex[release_type], release_string))
+            m = re.search(_releases_regex[release_type], release_string)
             found = m.group(1) if m else None
 
         case _:
             raise NotImplementedError(
                 f"Unknown release type: {release_type} in release {release_string}."
-                )
+            )
 
     return version.parse(found) if found is not None else None
 
 
-def get_releases(release_string: str, target_releases: Optional[List[str]] = None) -> Dict[str,version.Version]:
+def get_releases(
+    release_string: str, target_releases: Optional[List[str]] = None
+) -> Dict[str, version.Version]:
     if target_releases is None:
         target_releases = list(_releases_regex.keys())
     this_rel_versions = {}
@@ -55,11 +56,15 @@ def get_releases(release_string: str, target_releases: Optional[List[str]] = Non
         if this_rel_versions[target_rel]:
             has_rel = True
     if not has_rel:
-        raise AssertionError(f"No valid release found for release string {release_string}")
+        raise AssertionError(
+            f"No valid release found for release string {release_string}"
+        )
     return this_rel_versions
 
 
-def get_release_table(release_list: List[str], target_releases: Optional[List[str]] = None) -> pd.DataFrame:
+def get_release_table(
+    release_list: List[str], target_releases: Optional[List[str]] = None
+) -> pd.DataFrame:
     if target_releases is None:
         target_releases = list(_releases_regex.keys())
     rows = []
@@ -76,9 +81,11 @@ def get_release_table(release_list: List[str], target_releases: Optional[List[st
     return release_table
 
 
-def get_latest_release(release_table: pd.DataFrame) -> Dict[str, Optional[version.Version]]:
+def get_latest_release(
+    release_table: pd.DataFrame,
+) -> Dict[str, Optional[version.Version]]:
     latest_rel = {}
-    for (release_type, release_ver) in release_table.items():
+    for release_type, release_ver in release_table.items():
         ver_list = [r for r in release_ver if r is not None]
         if len(ver_list) > 0:
             latest_rel[release_type] = max(ver_list)

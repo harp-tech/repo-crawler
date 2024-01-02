@@ -5,12 +5,11 @@ from typing import Optional, Dict
 
 
 class HarpSpreadsheet:
-
     def __init__(
         self,
         spreadsheet: Optional[str] = None,
-        credentials: Optional[str | Dict] = None) -> None:
-
+        credentials: Optional[str | Dict] = None,
+    ) -> None:
         if credentials:
             if isinstance(credentials, str):
                 credentials = json.loads(credentials, strict=False)
@@ -28,21 +27,29 @@ class HarpSpreadsheet:
 
     def get_worksheet(self, title: str) -> gspread.worksheet:
         if self._sh is None:
-            raise ValueError("No valid spreadsheet found. Try self.open_spreadsheet() first.")
+            raise ValueError(
+                "No valid spreadsheet found. Try self.open_spreadsheet() first."
+            )
         self.current_worksheet = self._sh.worksheet(title=title)
         return self.current_worksheet
 
     def add_worksheet(self, title: str) -> gspread.worksheet:
         if self._sh is None:
-            raise ValueError("No valid spreadsheet found. Try self.open_spreadsheet() first.")
-        self.current_worksheet = self._sh.add_worksheet(title=title, rows=100,cols=100)
+            raise ValueError(
+                "No valid spreadsheet found. Try self.open_spreadsheet() first."
+            )
+        self.current_worksheet = self._sh.add_worksheet(title=title, rows=100, cols=100)
         return self.current_worksheet
 
     def del_worksheet(self) -> None:
         if self._sh is None:
-            raise ValueError("No valid spreadsheet found. Try self.open_spreadsheet() first.")
+            raise ValueError(
+                "No valid spreadsheet found. Try self.open_spreadsheet() first."
+            )
         if self.current_worksheet is None:
-            raise ValueError("No valid worksheet found. Try self.add_worksheet(title) first.")
+            raise ValueError(
+                "No valid worksheet found. Try self.add_worksheet(title) first."
+            )
         self._sh.del_worksheet(worksheet=self.current_worksheet)
         self.current_worksheet = None
 
@@ -52,5 +59,7 @@ class HarpSpreadsheet:
         except gspread.WorksheetNotFound:
             _ = self.add_worksheet(title=title)
         self.current_worksheet.clear()
-        self.current_worksheet.update([table.columns.values.tolist()] + table.values.tolist())
+        self.current_worksheet.update(
+            [table.columns.values.tolist()] + table.values.tolist()
+        )
         self.current_worksheet.freeze(cols=1)
