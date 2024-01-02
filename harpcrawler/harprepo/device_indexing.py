@@ -24,16 +24,15 @@ class WhoAmIList(BaseModel):
 
 
 def read_whoami_file(
-        file_path: str = "https://raw.githubusercontent.com/harp-tech/protocol/main/whoami.yml",
-        is_remote: bool = True
-        ) -> WhoAmIList:
-
+    file_path: str = "https://raw.githubusercontent.com/harp-tech/protocol/main/whoami.yml",
+    is_remote: bool = True,
+) -> WhoAmIList:
     if is_remote:
         response = requests.get(file_path, allow_redirects=True)
         content = response.content.decode("utf-8")
         content = yaml.safe_load(content)
     else:
-        with open(file_path, 'r') as stream:
+        with open(file_path, "r") as stream:
             content = yaml.safe_load(stream)
 
     return WhoAmIList(**content)
@@ -60,7 +59,9 @@ class DeviceUrl:
     def get_repo(self) -> Repository:
         if self.is_github:
             try:
-                repo = self.github_client.get_repo(f"{self.organization}/{self.repository}")
+                repo = self.github_client.get_repo(
+                    f"{self.organization}/{self.repository}"
+                )
                 return repo
             except UnknownObjectException:
                 print(f"Repository {self.organization}/{self.repository} not found!")
