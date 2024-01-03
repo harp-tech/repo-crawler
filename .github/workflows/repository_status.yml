@@ -2,6 +2,8 @@
 name: RepositoryStatus
 
 on:
+  schedule:
+    - cron: '00 18 * * *'
   workflow_dispatch:
 
 jobs:
