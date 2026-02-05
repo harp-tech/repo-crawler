@@ -1,0 +1,18 @@
+[project]
+name = "repo-crawler"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dotmap>=1.3.30",
+    "gspread-formatting>=1.2.1",
+    "markdown>=3.10.1",
+    "numpy>=2.4.2",
+    "packaging>=26.0",
+    "pandas>=3.0.0",
+    "pandoc>=2.4",
+    "pydantic>=2.12.5",
+    "pygithub>=2.8.1",
+    "pyyaml>=6.0.3",
+]

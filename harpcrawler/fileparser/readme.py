@@ -26,8 +26,8 @@ def validate(
         # Run tests
         warnings.append(test_headers(parsed_content, parsed_template_content))
         warnings.append(test_pcb_image(parsed_content))
-    except:
-        warnings.append("Could not parse file.")
+    except Exception as e:
+        warnings.append("Could not parse file %s. Error: %s" % (filepath, str(e)))
     return warnings
 
 

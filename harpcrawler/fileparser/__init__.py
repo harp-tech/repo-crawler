@@ -30,12 +30,10 @@ def validate_content(
     return warnings
 
 
-import yaml
-from typing import Dict
-from yaml import Loader
+def parse_yml(content: str) -> dict:
+    import yaml
+    from yaml import Loader
 
-
-def parse_yml(content: str) -> Dict:
     try:
         return yaml.load(content, Loader)
     except yaml.YAMLError as exception:

@@ -120,5 +120,5 @@ class TemplatePeripheralRepo(PeripheralRepo):
             cols.insert(0, "Device")
             diagnosis_table["Device"] = diagnosis_table.index
             diagnosis_table = diagnosis_table[cols]
-            diagnosis_table = diagnosis_table.replace({True: "\u2705", False: "\u274C"})
+            diagnosis_table = diagnosis_table.replace({True: "\u2705", False: "\u274c"})
             return diagnosis_table

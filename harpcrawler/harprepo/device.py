@@ -133,9 +133,10 @@ class TemplateDeviceRepo(DeviceRepo):
 
                 # Match firmware releases
                 if (has_yml) and (output_table["FirmwareVersion"] is not None):
-                    output_table["HasUpdatedFirmware"] = version.parse(
-                        output_table["schema_firmwareVersion"]
-                    ) == (output_table["FirmwareVersion"])
+                    output_table["HasUpdatedFirmware"] = (
+                        version.parse(output_table["schema_firmwareVersion"])
+                        == (output_table["FirmwareVersion"])
+                    )
                 else:
                     output_table["HasUpdatedFirmware"] = False
 
@@ -184,5 +185,5 @@ class TemplateDeviceRepo(DeviceRepo):
             cols.insert(0, "Device")
             diagnosis_table["Device"] = diagnosis_table.index
             diagnosis_table = diagnosis_table[cols]
-            diagnosis_table = diagnosis_table.replace({True: "\u2705", False: "\u274C"})
+            diagnosis_table = diagnosis_table.replace({True: "\u2705", False: "\u274c"})
             return diagnosis_table
