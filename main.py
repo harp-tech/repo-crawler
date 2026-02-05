@@ -2,23 +2,23 @@
 # -*- coding: utf-8 -*-
 from github import Github, Auth
 import pandas as pd
+import os
 
 from harpcrawler.harprepo.device import DeviceRepo, TemplateDeviceRepo
 from harpcrawler.harprepo.peripheral import PeripheralRepo, TemplatePeripheralRepo
 from harpcrawler.gsheets import HarpSpreadsheet
-import harpcrawler._private
 
 from harpcrawler.harprepo.device_indexing import read_whoami_file, DeviceUrl
 
 # Tokens
-GITHUB_KEY = harpcrawler._private.github_credentials()
-GOOGLE_KEY = None
+GITHUB_KEY = os.environ.get("CREDENTIAL_GITHUB", None)
+GOOGLE_KEY = os.environ.get("CREDENTIAL_GOOGLE", None)
 
 # Flags
 ORGANIZATION = "harp-tech"
 SPREADSHEET = "GitHarpCrawler"
 PRINT_DIAGNOSIS = True
-UPDATE_SPREADSHEET = False
+UPDATE_SPREADSHEET = True
 
 
 def main():
@@ -78,9 +78,7 @@ def main():
         )
     ]
     peripheral_template.run_diagnosis(repos_to_validate=peripheral_repos)
-    peripherals_diagnosis = peripheral_template.print_diagnosis().map(
-        lambda x: str(x)
-    )
+    peripherals_diagnosis = peripheral_template.print_diagnosis().map(lambda x: str(x))
 
     if PRINT_DIAGNOSIS:
         print(peripherals_diagnosis)
