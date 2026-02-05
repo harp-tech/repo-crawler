@@ -3,7 +3,7 @@ name: RepositoryStatus
 
 on:
   schedule:
-    - cron: '00 18 * * *'
+    - cron: "00 18 * * *"
   workflow_dispatch:
 
 jobs:
@@ -14,9 +14,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: main
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Sync dependencies
+        run: uv sync --no-dev
       - name: pandoc
         run: sudo apt-get install -y pandoc
       - name: Run RepositoryStatus
@@ -24,5 +25,4 @@ jobs:
           CREDENTIAL_GITHUB: ${{ secrets.CREDENTIAL_GITHUB }}
           CREDENTIAL_GOOGLE: ${{ secrets.CREDENTIAL_GOOGLE }}
         run: |
-          pip install -r requirements.txt
-          python3 main.py
+          uv run main.py
