@@ -57,7 +57,7 @@ def main():
     device_repos = [DeviceRepo(repo, device_template) for repo in tracked_repositories]
 
     device_template.run_diagnosis(repos_to_validate=device_repos)
-    device_diagnosis = device_template.print_diagnosis().applymap(lambda x: str(x))
+    device_diagnosis = device_template.print_diagnosis().map(lambda x: str(x))
 
     if PRINT_DIAGNOSIS:
         print(device_diagnosis)
@@ -78,7 +78,7 @@ def main():
         )
     ]
     peripheral_template.run_diagnosis(repos_to_validate=peripheral_repos)
-    peripherals_diagnosis = peripheral_template.print_diagnosis().applymap(
+    peripherals_diagnosis = peripheral_template.print_diagnosis().map(
         lambda x: str(x)
     )
 
