@@ -24,7 +24,7 @@ class WhoAmIList(BaseModel):
 
 
 def read_whoami_file(
-    file_path: str = "https://raw.githubusercontent.com/harp-tech/protocol/main/whoami.yml",
+    file_path: str = "https://raw.githubusercontent.com/harp-tech/whoami/refs/heads/main/whoami.yml",
     is_remote: bool = True,
 ) -> WhoAmIList:
     if is_remote:
@@ -34,7 +34,7 @@ def read_whoami_file(
     else:
         with open(file_path, "r") as stream:
             content = yaml.safe_load(stream)
-
+    print(content)
     return WhoAmIList(**content)
 
 

@@ -37,9 +37,7 @@ def main():
 
     harp_organization = gh.get_organization(ORGANIZATION)
 
-    who_am_i_list = read_whoami_file(
-        file_path="https://raw.githubusercontent.com/harp-tech/protocol/main/whoami.yml"
-    )
+    who_am_i_list = read_whoami_file()
     who_am_i_df = pd.DataFrame(
         [
             who_am_i_list.devices[whoami].model_dump()
@@ -48,15 +46,14 @@ def main():
         index=who_am_i_list.devices.keys(),
     )
     who_am_i_df["deviceUrl"] = who_am_i_df["repositoryUrl"].apply(
-        lambda x: DeviceUrl(x, gh) if x else None
+        lambda x: DeviceUrl(x, gh) if not pd.isna(x) else None
     )
     tracked_repositories = [
-        repo
-        for repo in [
-            repo_url.get_repo() for repo_url in who_am_i_df["deviceUrl"] if repo_url
-        ]
-        if repo
+        repo_url.get_repo()
+        for repo_url in who_am_i_df[who_am_i_df["authors"] == "harp-tech"]["deviceUrl"]
+        if repo_url is not None
     ]
+    tracked_repositories = [repo for repo in tracked_repositories if repo is not None]
     device_repos = [DeviceRepo(repo, device_template) for repo in tracked_repositories]
 
     device_template.run_diagnosis(repos_to_validate=device_repos)
