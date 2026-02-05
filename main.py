@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from github import Github
+from github import Github, Auth
 import pandas as pd
 
 from harpcrawler.harprepo.device import DeviceRepo, TemplateDeviceRepo
@@ -28,7 +28,7 @@ def main():
             spreadsheet=SPREADSHEET, credentials=GOOGLE_KEY
         )
 
-    gh = Github(login_or_token=GITHUB_KEY)
+    gh = Github(auth=Auth.Token(GITHUB_KEY))
 
     device_template = TemplateDeviceRepo(gh.get_repo(f"{ORGANIZATION}/device.template"))
     peripheral_template = TemplatePeripheralRepo(
